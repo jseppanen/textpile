@@ -2,6 +2,7 @@ from flask import Flask, request
 from flask import Flask, request, session, g, jsonify, \
     redirect, url_for, abort, render_template, flash
 import sqlite3
+import json
 
 app=Flask(__name__)
 app.config.from_object(__name__)
@@ -44,13 +45,17 @@ def most_relevant():
     offset = request.args.get('offset', 0, type=int)
     num = request.args.get('num', 10, type=int)
     sql = '''
-        SELECT a.doc_id, a.relevance, b.title, b.body, b.url, b.published_date
+        SELECT a.doc_id, a.relevance, a.explain_json,
+            b.title, b.body, b.url, b.published_date
         FROM doc_relevance a JOIN doc b USING (doc_id)
         ORDER BY a.relevance DESC LIMIT ? OFFSET ?
     '''
     cur = db.execute(sql, [num, offset])
     res = cur.fetchall()
-    return jsonify(results=map(dict, res))
+    res = map(dict, res)
+    for r in res:
+        r['explain'] = json.loads(r.pop('explain_json'))
+    return jsonify(results=res)
 
 @app.route('/tagged/<tag>')
 def tagged(tag):

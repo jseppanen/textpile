@@ -32,10 +32,10 @@ def train(docs, labels, regu=1, bg_weight=.1):
     #print accuracy(labels, model.predict(X))
     return dict(idf=idf, logreg=model, lda=None)
 
-def predict(model, docs):
+def predict(model, docs, doc_ids, topk=9999):
     '''
     :param docs: iterator of (title, body) pairs
-    :return: labels, scores
+    :return: list of top ranked (doc_id, label, score, keywords)
     '''
     feas = map(extract_words,  docs)
     X,vocab=extract_feas(feas, model['idf'])
@@ -46,7 +46,24 @@ def predict(model, docs):
     # return all scores for "good" class
     assert model['logreg'].classes_[1] == 2
     pred_scores = pp[:,1]
-    return pred_labels, pred_scores
+    # find top items
+    ii = np.argsort(-pred_scores)[:topk]
+    doc_ids = list(doc_ids)
+    doc_ids = [doc_ids[i] for i in ii]
+    pred_labels = pred_labels[ii]
+    pred_scores = pred_scores[ii]
+    # attach top-5 strongest keywords for each item
+    fea_scores = X[ii].multiply(model['logreg'].coef_).getA()
+    fea_ids = np.argsort(-fea_scores, axis=1)[:,:5]
+    def mkeyword(f):
+        if f[0] == 'desc':
+            return f[1]
+        return '%s:%s' % f
+    keywords = [[{'keyword': mkeyword(vocab[j]),
+                  'score': round(fea_scores[i,j]*1000)}
+                 for j in jj]
+                for i,jj in enumerate(fea_ids)]
+    return zip(doc_ids, pred_labels, pred_scores, keywords)
 
 def tune_hyper(docs, labels):
     feas = map(extract_words,  docs)

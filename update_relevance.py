@@ -1,6 +1,7 @@
 
 import sqlite3
 import datetime as dt
+import json
 from model import train, predict
 
 # accuracy 0.504783831626 *
@@ -13,10 +14,12 @@ def update():
     docs, labels = query_train(conn)
     model = train(docs, labels, **param)
     docs, doc_ids = query_predict(conn)
-    labels, scores = predict(model, docs)
+    preds = predict(model, docs, doc_ids, topk=1000)
     conn.execute('DELETE FROM doc_relevance')
-    sql = 'INSERT INTO doc_relevance (doc_id, relevance) VALUES (?,?)'
-    res = ((id, sco) for id, sco, lab in zip(doc_ids, scores, labels))
+    sql = 'INSERT INTO doc_relevance (doc_id, relevance, explain_json) VALUES (?,?,?)'
+
+    res = ((id, sco, json.dumps(exp))
+            for id, lab, sco, exp in preds)
     conn.executemany(sql, res)
     sql = 'UPDATE meta SET value = ? WHERE key = \'last_updated\''
     now = dt.datetime.utcnow().isoformat(' ')[:19]

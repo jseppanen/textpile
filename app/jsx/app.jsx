@@ -7,15 +7,23 @@ var Doc = React.createClass({
     return {good:false, bad:false};
   },
   render: function() {
+    var keywords_li = this.props.doc.explain.map(function(e) {
+      return <li>{e.score} {e.keyword}</li>;
+    });
     return (
       <div className={"featurette " + (this.state.bad ? "hidden" : "")}>
         <div className="row">
           <div className="col-md-10">
             <h2 className="featurette-heading">
               <a href={this.props.doc.url}>{this.props.doc.title}</a>&nbsp;
-              <small>
                 <span className="pull-right">{this.props.doc.published_date}</span>
-	        {this.props.doc.relevance !== undefined ? ("" + Math.round(100*this.props.doc.relevance) + "%") : ""}</small>
+	        <div className="btn-group">
+	          <button type="button" className="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+	            {this.props.doc.relevance !== undefined ? ("" + Math.round(100*this.props.doc.relevance) + "% ") : ""}
+	            <span className="caret"></span>
+	          </button>
+	          <ul className="dropdown-menu">{keywords_li}</ul>
+	        </div>
             </h2>
           </div>
           <div className="col-md-2">
