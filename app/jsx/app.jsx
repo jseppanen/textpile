@@ -16,7 +16,7 @@ var Doc = React.createClass({
           <div className="col-md-10">
             <h2 className="featurette-heading">
               <a href={this.props.doc.url}>{this.props.doc.title}</a>&nbsp;
-                <span className="pull-right">{this.props.doc.published_date}</span>
+                <span className="pull-right"><small>{this.props.doc.published_date}</small></span>
 	        <div className="btn-group">
 	          <button type="button" className="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
 	            {this.props.doc.relevance !== undefined ? ("" + Math.round(100*this.props.doc.relevance) + "% ") : ""}
