@@ -1,0 +1,1 @@
+0 3 * * * /srv/textpile/crawl.daily.sh >/srv/textpile/crawl.daily.log 2>&1

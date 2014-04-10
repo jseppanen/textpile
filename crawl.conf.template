@@ -1,0 +1,4 @@
+search_url = 'http://host/search'
+search_params = {'lang': 'en'}
+headers = {'User-Agent': 'textpile'}
+host = 'host'

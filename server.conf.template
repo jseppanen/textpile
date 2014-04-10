@@ -1,0 +1,3 @@
+USERNAME = '<insert username here>'
+PASSWORD = '<insert password here>'
+SECRET_KEY = '<insert long and complex text here>'
