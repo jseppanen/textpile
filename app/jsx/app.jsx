@@ -7,9 +7,21 @@ var Doc = React.createClass({
     return {good:false, bad:false};
   },
   render: function() {
-    var keywords_li = this.props.doc.explain.map(function(e) {
-      return <li>{e.score} {e.keyword}</li>;
-    });
+    var relevance_button = <div />;
+    if (this.props.doc.relevance !== undefined) {
+      var keywords_li = this.props.doc.explain.map(function(e) {
+        return <li>{e.score} {e.keyword}</li>;
+      });
+      relevance_button = (
+        <div className="btn-group">
+          <button type="button" className="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+            {"" + Math.round(100*this.props.doc.relevance) + "% "}
+            <span className="caret"></span>
+          </button>
+          <ul className="dropdown-menu">{keywords_li}</ul>
+        </div>
+      );
+    }
     return (
       <div className={"featurette " + (this.state.bad ? "hidden" : "")}>
         <div className="row">
@@ -17,13 +29,7 @@ var Doc = React.createClass({
             <h2 className="featurette-heading">
               <a href={this.props.doc.url}>{this.props.doc.title}</a>&nbsp;
                 <span className="pull-right"><small>{this.props.doc.published_date}</small></span>
-	        <div className="btn-group">
-	          <button type="button" className="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
-	            {this.props.doc.relevance !== undefined ? ("" + Math.round(100*this.props.doc.relevance) + "% ") : ""}
-	            <span className="caret"></span>
-	          </button>
-	          <ul className="dropdown-menu">{keywords_li}</ul>
-	        </div>
+              {relevance_button}
             </h2>
           </div>
           <div className="col-md-2">
