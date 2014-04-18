@@ -72,7 +72,7 @@ def tune_hyper(docs, labels):
     best_param = {}
     best_accuracy = -1.0
     num_topics=50
-    for bg_weight in [1e-3, 3e-3, 1e-2, 3e-3, 1e-1, 3e-1,
+    for bg_weight in [1e-3, 3e-3, 1e-2, 3e-2, 1e-1, 3e-1,
                       1e0, 3e0, 1e1, 3e1]:
         for regu in [1e-6, 3e-6, 1e-5, 3e-5, 1e-4, 3e-4,
                      1e-3, 3e-3, 1e-2, 3e-2, 1e-1, 3e-1]:
