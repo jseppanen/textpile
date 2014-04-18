@@ -18,21 +18,23 @@ def load(paths):
                        location=doc['location_text'],
                        published=date)
 
-def load_ilmo():
-    soup=BeautifulSoup(file('ilmoituksia_2014.html'))
+def load_ilmo(path):
+    soup=BeautifulSoup(file(path))
     title = None
     desc = []
-    for el in soup.body:
-        if el.name == 'h1':
+    for el in soup.body.descendants:
+        if el.name == 'h1' and el.text.strip():
             if title is not None:
+                assert desc
                 yield dict(title=title, desc=' '.join(desc))
-            title = el.text
+            title = el.text.strip()
             desc = []
-        elif isinstance(el, Tag):
-            desc.append(el.text)
         elif isinstance(el, NavigableString):
-            desc.append(unicode(el))
+            txt = unicode(el).strip()
+            if txt:
+                desc.append(txt)
     if title is not None:
+        assert desc
         yield dict(title=title, desc=' '.join(desc))
 
 date_re = re.compile(r'^(\d\d?)\.(\d\d?)\.(\d\d\d\d)$')
