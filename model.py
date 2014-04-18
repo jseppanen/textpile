@@ -72,10 +72,10 @@ def tune_hyper(docs, labels):
     best_param = {}
     best_accuracy = -1.0
     num_topics=50
-    for bg_weight in [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0]:
-        for regu in [1e-8, 3e-8, 1e-7, 3e-7, 1e-6, 3e-6,
-                     1e-5, 3e-5, 1e-4, 3e-4, 1e-3, 3e-3,
-                     1e-2, 3e-2, 1e-1, 3e-1]:
+    for bg_weight in [1e-3, 3e-3, 1e-2, 3e-3, 1e-1, 3e-1,
+                      1e0, 3e0, 1e1, 3e1]:
+        for regu in [1e-6, 3e-6, 1e-5, 3e-5, 1e-4, 3e-4,
+                     1e-3, 3e-3, 1e-2, 3e-2, 1e-1, 3e-1]:
             param = dict(bg_weight=bg_weight,
                          regu=regu)
             acc = crossvalidate(feas, labels, param)
@@ -105,8 +105,14 @@ def crossvalidate(feas, labels, param):
                             fit_intercept=True,
                             shuffle=True, n_iter=50)
         model.fit(X[train_ids], labels_train, sample_weight=weights)
-        labels_pred = model.predict(X[valid_ids])
-        a=accuracy(labels[valid_ids], labels_pred, 1)
+        pp = model.predict_proba(X[valid_ids])
+        pred_labels = np.argmax(pp, 1)
+        pred_labels = model.classes_[pred_labels]
+        #a=accuracy(labels[valid_ids], pred_labels, 1)
+        # return all scores for "good" class
+        assert model.classes_[1] == 2
+        pred_scores = pp[:,1]
+        a=avg_precision(labels[valid_ids], pred_scores)
         print '%.2f' % a,
         accs.append(a)
     return np.mean(accs)
@@ -139,6 +145,22 @@ def accuracy(true_labels, pred_labels, false_negative_weight=100):
         a = sum(weights[ids] * correct[ids]) / sum(weights[ids])
         acc.append(a)
     return np.mean(acc)
+
+def avg_precision(true_labels, pred_scores):
+    # ignore unknown documents
+    ids = (true_labels > 0)
+    true_labels = true_labels[ids]
+    pred_scores = pred_scores[ids]
+    ranking = np.argsort(-pred_scores)
+    ranks = np.zeros(len(ranking))
+    ranks[ranking] = np.arange(len(ranking))
+    ranks = ranks[true_labels == 2]
+    ranks.sort()
+    ap = 0
+    for n,r in enumerate(ranks):
+        ap += (n+1.0) / (r+1.0)
+    ap /= len(ranks)
+    return ap
 
 toks_re = re.compile(r'\w+', re.UNICODE)
 def toks(txt):
