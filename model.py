@@ -5,6 +5,7 @@ from scipy import sparse
 from collections import defaultdict
 import re
 import numpy as np
+import sys
 
 def train(docs, labels, regu=1, bg_weight=.1):
     '''
@@ -67,41 +68,48 @@ def predict(model, docs, doc_ids, topk=9999):
 
 def tune_hyper(docs, labels):
     feas = map(extract_words,  docs)
-    labels = np.array(list(labels), dtype=int)
+    labels = list(labels)
     best_param = {}
     best_accuracy = -1.0
     num_topics=50
-    for bg_weight in [.01, .03, .1, .3, 1]:
-        for regu in [1e-4, 3e-4, 1e-3, 3e-3, 1e-2, 3e-2, 1e-1,
-                     3e-1, 1e0, 3e0, 1e1, 3e1]:
-            accs = []
-            for train_ids, valid_ids in StratifiedKFold(labels, 10):
-                idf=train_idf([feas[i] for i in train_ids])
-                X,vocab=extract_feas(feas, idf)
-                #lda=train_lda(X, vocab, num_topics)
-                #X=transform_lda(X, lda)
-                labels_train = labels[train_ids].copy()
-                weights = balance_weights(labels_train, bg_weight)
-                labels_train[labels_train == 0] = 1
-                model=SGDClassifier(loss='log',
-                                    alpha=regu/len(labels_train),
-                                    fit_intercept=True,
-                                    shuffle=True, n_iter=50)
-                model.fit(X[train_ids], labels_train, sample_weight=weights)
-                labels_pred = model.predict(X[valid_ids])
-                a=accuracy(labels[valid_ids], labels_pred, 1)
-                print a,
-                accs.append(a)
-            acc = np.mean(accs)
-            print '|', bg_weight, regu, acc,
+    for bg_weight in [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0]:
+        for regu in [1e-8, 3e-8, 1e-7, 3e-7, 1e-6, 3e-6,
+                     1e-5, 3e-5, 1e-4, 3e-4, 1e-3, 3e-3,
+                     1e-2, 3e-2, 1e-1, 3e-1]:
+            param = dict(bg_weight=bg_weight,
+                         regu=regu)
+            acc = crossvalidate(feas, labels, param)
+            print '| %g %g %.4f' % (bg_weight, regu, acc),
             if acc > best_accuracy:
-                best_param = dict(bg_weight=bg_weight,
-                                  regu=regu)
+                best_param = param
                 best_accuracy = acc
                 print '*'
             else:
                 print
+            sys.stdout.flush()
     return best_param
+
+def crossvalidate(feas, labels, param):
+    labels = np.array(list(labels), dtype=int)
+    accs = []
+    for train_ids, valid_ids in StratifiedKFold(labels, 10):
+        idf=train_idf([feas[i] for i in train_ids])
+        X,vocab=extract_feas(feas, idf)
+        #lda=train_lda(X, vocab, num_topics)
+        #X=transform_lda(X, lda)
+        labels_train = labels[train_ids].copy()
+        weights = balance_weights(labels_train, param['bg_weight'])
+        labels_train[labels_train == 0] = 1
+        model=SGDClassifier(loss='log',
+                            alpha=param['regu']/len(labels_train),
+                            fit_intercept=True,
+                            shuffle=True, n_iter=50)
+        model.fit(X[train_ids], labels_train, sample_weight=weights)
+        labels_pred = model.predict(X[valid_ids])
+        a=accuracy(labels[valid_ids], labels_pred, 1)
+        print '%.2f' % a,
+        accs.append(a)
+    return np.mean(accs)
 
 def balance_weights(labels, bg_weight):
     '''0: weakly-negative "background" class
