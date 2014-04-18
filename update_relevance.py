@@ -4,10 +4,8 @@ import datetime as dt
 import json
 from model import train, predict
 
-# accuracy 0.504783831626 *
-#param = {'regu': 0.5, 'bg_weight': 1}
-# accuracy 0.78850877193 *
-param = dict(regu=0.01, bg_weight=0.03)
+#param = dict(regu=0.01, bg_weight=0.03)
+param = dict(regu=1e-3, bg_weight=1e-4)
 
 def update():
     conn = sqlite3.connect('textpile.db')
