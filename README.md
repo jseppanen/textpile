@@ -8,7 +8,8 @@ pip install msgpack-python
 
 classifier:
 pip install beautifulsoup4 lxml html5lib
-pip install numpy scipy scikit-learn
+pip install numpy scipy>=0.13.3 scikit-learn
+pip install cython gensim
 
 web app (devel):
 pip install Flask
