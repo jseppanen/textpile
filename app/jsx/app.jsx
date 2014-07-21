@@ -76,6 +76,7 @@ var Doc = React.createClass({
         console.error(url, status, error.toString());
       }.bind(this)
     });
+    this.props.scrollListener();
     return false;
   }
 });
@@ -135,8 +136,9 @@ var DocList = React.createClass({
     if (!this.props.active)
       return <div className="hidden" />
     console.log("DocList render: " + this.props.page);
+    var sl = this.scrollListener.bind(this);
     var docs = this.state.docs.map(function (doc) {
-      return <Doc doc={doc} key={doc.doc_id} />;
+      return <Doc doc={doc} key={doc.doc_id} scrollListener={sl} />;
     });
     return (
       <div className="container marketing">
