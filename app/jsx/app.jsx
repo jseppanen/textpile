@@ -200,6 +200,9 @@ var Navbar = React.createClass({
             <li className={this.props.page == "tagged/bad" ? "active" : ""}>
               <a href="#" onClick={this.click} id="tagged/bad">
                 {this.state.num_bad} huonoa</a></li>
+            <li className={this.props.page == "random" ? "active" : ""}>
+              <a href="#" onClick={this.click} id="random">
+                random</a></li>
           </ul>
           <p className="navbar-text navbar-right">Päivitetty {this.state.last_updated}</p>
         </div>
@@ -226,6 +229,7 @@ var App = React.createClass({
       <DocList page="most_relevant" active={this.state.page == "most_relevant"} />
       <DocList page="tagged/good" active={this.state.page == "tagged/good"} />
       <DocList page="tagged/bad" active={this.state.page == "tagged/bad"} />
+      <DocList page="random" active={this.state.page == "random"} />
       <footer className="container">
         <p className="pull-right">Jee!</p>
       </footer>
