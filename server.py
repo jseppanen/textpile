@@ -80,17 +80,15 @@ def random():
     offset = request.args.get('offset', 0, type=int)
     num = request.args.get('num', 10, type=int)
     sql = '''
-        SELECT a.doc_id, a.explain_json,
-            b.title, b.body, b.url, b.published_date
-        FROM doc_relevance a JOIN doc b USING (doc_id)
+        SELECT a.doc_id, a.title, a.body, a.url, a.published_date
+        FROM doc a
+        LEFT JOIN doc_label b USING (doc_id)
+        WHERE b.doc_id IS NULL
         ORDER BY RANDOM() LIMIT ? OFFSET ?
     '''
     cur = db.execute(sql, [num, offset])
     res = cur.fetchall()
-    res = map(dict, res)
-    for r in res:
-        r['explain'] = json.loads(r.pop('explain_json'))
-    return jsonify(results=res)
+    return jsonify(results=map(dict, res))
 
 @app.route('/doc/<int:doc_id>', methods=['GET', 'POST'])
 def doc(doc_id):
