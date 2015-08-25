@@ -1,1 +1,4 @@
-0 3 * * * /srv/textpile/crawl.daily.sh >/srv/textpile/crawl.daily.log 2>&1
+PATH=/opt/conda/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# NB the times are in UTC
+0 3 * * * root /bin/sh /srv/textpile/crawl.daily.sh >/srv/textpile/logs/crawl.daily.log 2>&1

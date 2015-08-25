@@ -10,8 +10,7 @@ from model import crossvalidate, tune_hyper, extract_words
 #param = dict(regu=1e-8, bg_weight=1e-5) # 0.825
 #param = dict(regu=1e-8, bg_weight=1e-4) # 0.822
 
-
-conn = sqlite3.connect('textpile.db')
+conn = sqlite3.connect('data/textpile.db')
 docs, labels = query_train(conn)
 
 #feas = map(extract_words, docs)

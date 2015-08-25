@@ -4,7 +4,7 @@ from parse import load_ilmo
 
 # load_ilmo.py ilmoituksia_2014.html
 
-conn = sqlite3.connect('textpile.db')
+conn = sqlite3.connect('data/textpile.db')
 cur = conn.cursor()
 
 doc_id, = cur.execute('select max(doc_id)+1 from doc').fetchone()

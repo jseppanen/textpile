@@ -6,10 +6,10 @@ import json
 
 app=Flask(__name__)
 app.config.from_object(__name__)
-app.config.update(DATABASE=app.root_path + '/textpile.db')
+app.config.update(DATABASE=app.root_path + '/data/textpile.db')
 # log errors in production to uwsgi.log
 app.config.update(PROPAGATE_EXCEPTIONS=True)
-app.config.from_pyfile(app.root_path + '/server.conf')
+app.config.from_pyfile(app.root_path + '/config/flask-server.conf')
 
 @app.route('/')
 def index():
@@ -146,4 +146,4 @@ def close_db(error):
         g.db_conn.close()
 
 if __name__=='__main__':
-    app.run()
+    app.run(host='0.0.0.0')

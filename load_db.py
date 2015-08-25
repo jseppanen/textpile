@@ -9,7 +9,7 @@ from parse import load
 paths = sys.argv[1:]
 assert paths
 
-conn = sqlite3.connect('textpile.db')
+conn = sqlite3.connect('data/textpile.db')
 cur = conn.cursor()
 
 # load postings (unknown labels)

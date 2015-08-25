@@ -8,7 +8,7 @@ from model import train, predict
 param = dict(regu=1e-3, bg_weight=1e-4)
 
 def update():
-    conn = sqlite3.connect('textpile.db')
+    conn = sqlite3.connect('data/textpile.db')
     docs, labels = query_train(conn)
     model = train(docs, labels, **param)
     docs, doc_ids = query_predict(conn)

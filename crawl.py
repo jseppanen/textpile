@@ -10,7 +10,7 @@ import logging
 from collections import defaultdict
 from itertools import groupby
 
-execfile('crawl.conf')
+execfile('config/crawl.conf.py')
 
 # crawl.py <data-dir> [date]
 

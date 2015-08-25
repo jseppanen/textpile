@@ -1,6 +1,6 @@
 import sqlite3
 
-conn = sqlite3.connect('textpile.db')
+conn = sqlite3.connect('data/textpile.db')
 cur = conn.cursor()
 
 cur.executescript(file('schema.sql').read())
