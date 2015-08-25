@@ -1,31 +1,68 @@
 # Textpile
 
-## Dependencies
-
-crawler:
-pip install requests
-pip install msgpack-python
-
-classifier:
-pip install beautifulsoup4 lxml html5lib
-pip install numpy scipy>=0.13.3 scikit-learn
-pip install cython gensim
-
-web app (devel):
-pip install Flask
-
+Simple document classifyin' web app.
 
 ## Deployment
 
-install in a virtualenv:
-    virtualenv /srv/textpile
-    . /srv/textpile/bin/activate
-    pip install Flask uwsgi
+1. Build Docker image.
 
-configure nginx (see config/nginx.conf)
+```
+docker build -t textpile github.com/jseppanen/textpile
+```
 
-run uwsgi server:
-    /srv/textpile/run.sh
+2. Create a container. Choose HTTP `<port>`.
+
+```
+docker create --restart=always -p <port>:80 --name textpile textpile
+```
+
+3. Configure Flask server and crawler. See `config/*.template`
+
+```
+docker cp flask-server.conf <container>:/srv/textpile/config/
+docker cp crawl.conf.py <container>:/srv/textpile/config/
+```
+
+4. (optional) Import data. Find out where `/srv/textpile/data` volume
+is mounted, and copy `textpile.db` there.
+
+```
+docker inspect <container>
+```
+
+5. Launch app.
+
+```
+docker start <container>
+```
+
+6. Configure host nginx (see config/nginx-proxy.conf)
+
+## files
+
+### web app
+
+app, static, templates
+
+### backend
+
+server.py
+config/server.conf(.template)
+
+creation: init_db.py, schema.sql
+
+### crawler and updater
+
+config/crawl.conf.py(.template)
+crawl.daily.cron
+crawl.daily.sh
+crawl.py
+load_db.py
+update_relevance.py
+
+## Dependencies
+
+See Dockerfile
 
 ## Copyright and license
 
