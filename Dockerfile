@@ -36,10 +36,6 @@ RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 RUN rm /etc/nginx/sites-enabled/default
 RUN ln -s /srv/textpile/config/nginx.conf /etc/nginx/sites-enabled/
 
-#RUN cp /srv/textpile/crawl.daily.cron /etc/cron.d/
-#RUN chmod 644 /etc/cron.d/crawl.daily.cron
-#RUN echo >/etc/crontab
-
 RUN cp /srv/textpile/crawl.daily.cron /etc/crontab
 RUN chmod 644 /etc/crontab
 
