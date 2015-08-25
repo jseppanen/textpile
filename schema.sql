@@ -29,6 +29,7 @@ create index label_doc_idx on doc_label(label_id);
 create table doc_relevance (
   doc_id integer primary key not null,
   relevance float not null,
+  explain_json text,
   foreign key(doc_id) references doc(doc_id)
 );
 
