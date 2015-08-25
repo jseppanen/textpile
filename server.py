@@ -7,6 +7,8 @@ import json
 app=Flask(__name__)
 app.config.from_object(__name__)
 app.config.update(DATABASE=app.root_path + '/textpile.db')
+# log errors in production to uwsgi.log
+app.config.update(PROPAGATE_EXCEPTIONS=True)
 app.config.from_pyfile(app.root_path + '/server.conf')
 
 @app.route('/')
